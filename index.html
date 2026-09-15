@@ -1,0 +1,1390 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>David Djekornom — Réseaux & Systèmes</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0A0F1C;
+    --panel:#111827;
+    --panel-2:#16223A;
+    --line:#1F2A3D;
+    --text:#ECEFF4;
+    --text-dim:#8A94A6;
+    --accent:#2DD4BF;
+    --accent-dim:#1B8F82;
+    --status:#E8A33D;
+    --radius:2px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html{scroll-behavior:smooth;}
+  body{
+    background:var(--bg);
+    color:var(--text);
+    font-family:'Inter',sans-serif;
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+  }
+  h1,h2,h3{
+    font-family:'Space Grotesk',sans-serif;
+    letter-spacing:-0.01em;
+    font-weight:600;
+  }
+  .mono{
+    font-family:'JetBrains Mono',monospace;
+  }
+  a{color:inherit;text-decoration:none;}
+
+  /* ---- layout shell ---- */
+  .shell{
+    display:grid;
+    grid-template-columns:280px 1fr;
+    min-height:100vh;
+  }
+  @media (max-width:880px){
+    .shell{grid-template-columns:1fr;}
+  }
+
+  /* ---- sidebar ---- */
+  .sidebar{
+    border-right:1px solid var(--line);
+    padding:48px 32px;
+    position:sticky;
+    top:0;
+    height:100vh;
+    display:flex;
+    flex-direction:column;
+    justify-content:space-between;
+  }
+  @media (max-width:880px){
+    .sidebar{
+      position:relative;
+      height:auto;
+      border-right:none;
+      border-bottom:1px solid var(--line);
+      padding:28px 24px;
+    }
+  }
+  .avatar{
+    width:76px;
+    height:76px;
+    border-radius:50%;
+    overflow:hidden;
+    border:1px solid var(--line);
+    background:var(--panel);
+    margin-bottom:20px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+  .avatar img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    display:block;
+  }
+  .avatar .avatar-fallback{
+    font-family:'Space Grotesk',sans-serif;
+    font-weight:600;
+    color:var(--accent);
+    font-size:1.3rem;
+  }
+  .id-block .name{
+    font-size:1.5rem;
+    line-height:1.25;
+  }
+  .id-block .role{
+    color:var(--accent);
+    font-size:0.85rem;
+    margin-top:6px;
+    font-family:'JetBrains Mono',monospace;
+  }
+  .id-block .location{
+    color:var(--text-dim);
+    font-size:0.8rem;
+    margin-top:14px;
+    display:flex;
+    align-items:center;
+    gap:6px;
+  }
+  .status-dot{
+    width:7px;height:7px;border-radius:50%;
+    background:var(--status);
+    display:inline-block;
+    box-shadow:0 0 0 3px rgba(232,163,61,0.15);
+  }
+
+  nav.primary{
+    margin-top:56px;
+    display:flex;
+    flex-direction:column;
+    gap:2px;
+  }
+  @media (max-width:880px){
+    nav.primary{
+      margin-top:24px;
+      flex-direction:row;
+      flex-wrap:wrap;
+      gap:4px 18px;
+    }
+  }
+  nav.primary a{
+    color:var(--text-dim);
+    font-size:0.85rem;
+    padding:8px 0;
+    border-left:2px solid transparent;
+    padding-left:14px;
+    transition:color .15s ease, border-color .15s ease;
+  }
+  @media (max-width:880px){
+    nav.primary a{border-left:none;padding-left:0;}
+  }
+  nav.primary a:hover{color:var(--text);border-color:var(--accent);}
+
+  .sidebar-foot{
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+    font-size:0.8rem;
+  }
+  @media (max-width:880px){ .sidebar-foot{display:none;} }
+  .sidebar-foot a{color:var(--text-dim);}
+  .sidebar-foot a:hover{color:var(--accent);}
+
+  /* ---- main ---- */
+  main{padding:0 40px;}
+  .content{
+    max-width:720px;
+    margin:0 auto;
+    padding:80px 0 120px;
+  }
+  section{margin-bottom:96px;scroll-margin-top:40px;}
+  section:last-child{margin-bottom:0;}
+
+  .section-num{
+    font-family:'JetBrains Mono',monospace;
+    color:var(--text-dim);
+    font-size:0.75rem;
+    display:block;
+    margin-bottom:10px;
+  }
+  section h2{
+    font-size:1.6rem;
+    margin-bottom:28px;
+  }
+
+  /* ---- hero ---- */
+  .hero{padding-top:20px;margin-bottom:120px;}
+  .hero h1{
+    font-size:clamp(2.2rem,5vw,3.2rem);
+    line-height:1.12;
+    max-width:11ch;
+  }
+  .hero .lede{
+    margin-top:24px;
+    font-size:1.05rem;
+    color:var(--text-dim);
+    max-width:52ch;
+  }
+  .terminal{
+    margin-top:36px;
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:16px 20px;
+    font-family:'JetBrains Mono',monospace;
+    font-size:0.85rem;
+    color:var(--accent);
+    max-width:fit-content;
+  }
+  .terminal .cursor{
+    display:inline-block;
+    width:7px;height:1em;
+    background:var(--accent);
+    margin-left:2px;
+    vertical-align:text-bottom;
+    animation:blink 1.1s steps(1) infinite;
+  }
+  @keyframes blink{50%{opacity:0;}}
+
+  /* ---- skills ---- */
+  .skill-group{
+    margin-bottom:28px;
+    padding-left:16px;
+    border-left:2px solid var(--line);
+  }
+  .skill-group.active{border-left-color:var(--accent);}
+  .skill-group h3{
+    font-size:0.95rem;
+    font-weight:600;
+    margin-bottom:10px;
+    color:var(--text);
+  }
+  .tags{display:flex;flex-wrap:wrap;gap:8px;}
+  .tag{
+    font-family:'JetBrains Mono',monospace;
+    font-size:0.78rem;
+    color:var(--text-dim);
+    border:1px solid var(--line);
+    padding:5px 10px;
+    border-radius:var(--radius);
+  }
+
+  /* ---- timeline ---- */
+  .timeline{position:relative;padding-left:24px;}
+  .timeline::before{
+    content:'';
+    position:absolute;
+    left:5px;top:6px;bottom:6px;
+    width:1px;
+    background:var(--line);
+  }
+  .tl-item{position:relative;margin-bottom:36px;}
+  .tl-item:last-child{margin-bottom:0;}
+  .tl-item::before{
+    content:'';
+    position:absolute;
+    left:-24px;top:6px;
+    width:9px;height:9px;
+    border-radius:50%;
+    background:var(--bg);
+    border:2px solid var(--accent);
+  }
+  .tl-date{
+    font-family:'JetBrains Mono',monospace;
+    font-size:0.75rem;
+    color:var(--text-dim);
+    margin-bottom:4px;
+  }
+  .tl-title{font-size:1rem;font-weight:600;}
+  .tl-org{color:var(--accent);font-size:0.88rem;margin-top:2px;}
+  .tl-desc{color:var(--text-dim);font-size:0.9rem;margin-top:8px;max-width:56ch;}
+
+  /* ---- certifications ---- */
+  .cert-list{display:flex;flex-direction:column;}
+  .cert-row{
+    display:flex;
+    justify-content:space-between;
+    align-items:baseline;
+    gap:16px;
+    padding:16px 0;
+    border-bottom:1px solid var(--line);
+  }
+  .cert-row:first-child{border-top:1px solid var(--line);}
+  .cert-name{font-weight:500;}
+  .cert-org{color:var(--text-dim);font-size:0.85rem;margin-top:2px;}
+  .cert-date{
+    font-family:'JetBrains Mono',monospace;
+    font-size:0.78rem;
+    color:var(--text-dim);
+    white-space:nowrap;
+  }
+
+  /* ---- infos personnelles ---- */
+  .info-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:20px;
+    margin-bottom:40px;
+  }
+  @media (max-width:560px){.info-grid{grid-template-columns:1fr;}}
+
+  /* ---- langues ---- */
+  .lang-list{display:flex;flex-direction:column;gap:18px;margin-bottom:40px;}
+  .lang-row .lang-head{
+    display:flex;
+    justify-content:space-between;
+    font-size:0.88rem;
+    margin-bottom:8px;
+  }
+  .lang-row .lang-name{font-weight:500;}
+  .lang-row .lang-level{color:var(--text-dim);font-family:'JetBrains Mono',monospace;font-size:0.75rem;}
+  .lang-bar{
+    height:4px;
+    background:var(--line);
+    border-radius:var(--radius);
+    overflow:hidden;
+  }
+  .lang-bar-fill{
+    height:100%;
+    background:var(--accent);
+  }
+
+  /* ---- centres d'intérêt ---- */
+  .interests{display:flex;flex-wrap:wrap;gap:8px;}
+
+  /* ---- références ---- */
+  .ref-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit, minmax(200px, 1fr));
+    gap:20px;
+  }
+  @media (max-width:560px){.ref-grid{grid-template-columns:1fr;}}
+  .ref-card{
+    border:1px solid var(--line);
+    padding:18px 20px;
+    border-radius:var(--radius);
+    transition:border-color .25s ease, transform .25s ease, box-shadow .25s ease;
+  }
+  .ref-card:hover{
+    border-color:var(--accent-dim);
+    transform:translateY(-3px);
+    box-shadow:0 12px 24px -14px rgba(45,212,191,0.25);
+  }
+  .ref-name{font-weight:500;}
+  .ref-role{color:var(--text-dim);font-size:0.82rem;margin-top:2px;}
+  .ref-contact{
+    font-family:'JetBrains Mono',monospace;
+    font-size:0.78rem;
+    color:var(--accent);
+    margin-top:10px;
+  }
+
+  /* ---- project ---- */
+  .project-card{
+    border:1px solid var(--line);
+    background:var(--panel);
+    padding:28px 28px 32px;
+    border-radius:var(--radius);
+  }
+  .project-status{
+    font-family:'JetBrains Mono',monospace;
+    font-size:0.72rem;
+    color:var(--status);
+    text-transform:lowercase;
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    margin-bottom:14px;
+  }
+  .project-card h3{font-size:1.15rem;margin-bottom:10px;}
+  .project-card p{color:var(--text-dim);font-size:0.92rem;max-width:58ch;}
+  .project-meta{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+    margin-top:18px;
+  }
+
+  /* ---- contact ---- */
+  .contact-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:20px;
+  }
+  @media (max-width:560px){.contact-grid{grid-template-columns:1fr;}}
+  .contact-item{
+    border:1px solid var(--line);
+    padding:18px 20px;
+    border-radius:var(--radius);
+    transition:border-color .15s ease;
+  }
+  .contact-item:hover{border-color:var(--accent-dim);}
+  .contact-label{
+    font-family:'JetBrains Mono',monospace;
+    font-size:0.72rem;
+    color:var(--text-dim);
+    margin-bottom:6px;
+  }
+  .contact-value{font-size:0.95rem;}
+
+  footer{
+    max-width:720px;
+    margin:0 auto;
+    padding:0 0 60px;
+    color:var(--text-dim);
+    font-size:0.78rem;
+    font-family:'JetBrains Mono',monospace;
+  }
+
+  /* =========================================================
+     BARRE D'ACTIONS (ajoutée)
+     Ce bloc CSS habille les 3 éléments (Écrire, Appeler, CV PDF)
+     qui apparaissent en haut à droite de la page.
+     ========================================================= */
+
+  /* Conteneur des boutons : position fixe = reste visible
+     même quand on fait défiler la page (sauf en mode print/PDF
+     où on le masque, voir plus bas). */
+  .dl-toolbar{
+    position:fixed;
+    top:20px;
+    right:20px;
+    z-index:1000;      /* passe au-dessus de tout le reste */
+    display:flex;
+    flex-wrap:wrap;     /* évite que les 3 éléments soient écrasés sur très petit écran */
+    justify-content:flex-end;
+    gap:10px;
+  }
+
+  /* Style visuel des boutons, harmonisé avec le thème sombre
+     du site (mêmes variables --panel, --line, --accent...) */
+  .dl-btn{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    background:var(--panel);
+    border:1px solid var(--line);
+    color:var(--text);
+    font-family:'JetBrains Mono',monospace;
+    font-size:0.75rem;
+    padding:10px 14px;
+    border-radius:var(--radius);
+    cursor:pointer;
+    transition:border-color .15s ease, color .15s ease, background .15s ease;
+  }
+  /* Effet au survol de la souris */
+  .dl-btn:hover{
+    border-color:var(--accent);
+    color:var(--accent);
+    background:var(--panel-2);
+  }
+  .dl-btn svg{width:14px;height:14px;flex-shrink:0;}
+
+  /* Etat "en cours de génération" : le bouton devient
+     semi-transparent et non-cliquable (voir fonction JS setLoading) */
+  .dl-btn.loading{opacity:0.6;pointer-events:none;}
+
+  /* Sur mobile/tablette : la barre passe au-dessus du contenu
+     au lieu de flotter, et les boutons prennent toute la largeur */
+  @media (max-width:880px){
+    .dl-toolbar{
+      position:static;
+      justify-content:center;
+      padding:16px 24px 0;
+    }
+    .dl-btn{flex:1;justify-content:center;}
+  }
+
+  /* Si jamais quelqu'un fait un Ctrl+P (impression navigateur),
+     on cache la barre pour ne pas la voir sur le papier */
+  @media print{
+    .dl-toolbar{display:none !important;}
+  }
+
+  /* =========================================================
+     COUCHE D'ANIMATIONS (ajoutée)
+     - Apparition douce des sections au défilement (reveal)
+     - Décalage (stagger) sur les listes : tags, timeline, certifs
+     - Barres de langues qui se remplissent à l'écran
+     - Halo de fond animé, discret, façon "signal réseau"
+     - Lien de menu actif qui suit le scroll (scrollspy)
+     - Respecte prefers-reduced-motion
+     ========================================================= */
+
+  html{
+    scroll-behavior:smooth;
+    scrollbar-color: var(--accent-dim) var(--bg);
+  }
+
+  /* Halo animé en fond de page, très discret, façon écho radar */
+  body{
+    position:relative;
+    overflow-x:hidden;
+  }
+  body::before{
+    content:'';
+    position:fixed;
+    top:-20%;
+    right:-15%;
+    width:640px;
+    height:640px;
+    background:radial-gradient(circle, rgba(45,212,191,0.10) 0%, rgba(45,212,191,0) 70%);
+    pointer-events:none;
+    z-index:0;
+    animation:drift 16s ease-in-out infinite alternate;
+  }
+  body::after{
+    content:'';
+    position:fixed;
+    bottom:-25%;
+    left:-10%;
+    width:520px;
+    height:520px;
+    background:radial-gradient(circle, rgba(232,163,61,0.06) 0%, rgba(232,163,61,0) 70%);
+    pointer-events:none;
+    z-index:0;
+    animation:drift 20s ease-in-out infinite alternate-reverse;
+  }
+  @keyframes drift{
+    0%{transform:translate(0,0) scale(1);}
+    100%{transform:translate(-30px,40px) scale(1.08);}
+  }
+  .shell, footer{position:relative;z-index:1;}
+
+  /* Entrée initiale de la sidebar et du hero au chargement */
+  .sidebar > div:first-child, .sidebar-foot{
+    animation:fadeSlideUp .7s ease both;
+  }
+  .sidebar-foot{animation-delay:.35s;}
+  .avatar{animation:avatarPop .6s cubic-bezier(.34,1.56,.64,1) both .05s;}
+  .hero h1{animation:fadeSlideUp .8s ease both .1s;}
+  .hero .lede{animation:fadeSlideUp .8s ease both .22s;}
+  .hero .terminal{animation:fadeSlideUp .8s ease both .34s;}
+
+  @keyframes fadeSlideUp{
+    from{opacity:0; transform:translateY(16px);}
+    to{opacity:1; transform:translateY(0);}
+  }
+  @keyframes avatarPop{
+    from{opacity:0; transform:scale(.6);}
+    to{opacity:1; transform:scale(1);}
+  }
+
+  /* Reveal au scroll : appliqué par JS via IntersectionObserver */
+  .reveal{
+    opacity:0;
+    transform:translateY(28px);
+    transition:opacity .7s cubic-bezier(.22,.61,.36,1), transform .7s cubic-bezier(.22,.61,.36,1);
+  }
+  .reveal.is-visible{
+    opacity:1;
+    transform:translateY(0);
+  }
+
+  /* Décalage automatique des enfants directs d'un conteneur .stagger
+     (tags, lignes de certifs, cartes...) une fois le parent visible */
+  .stagger > *{
+    opacity:0;
+    transform:translateY(14px);
+    transition:opacity .5s ease, transform .5s ease;
+  }
+  .stagger.is-visible > *{
+    opacity:1;
+    transform:translateY(0);
+  }
+  .stagger.is-visible > *:nth-child(1){transition-delay:.02s;}
+  .stagger.is-visible > *:nth-child(2){transition-delay:.08s;}
+  .stagger.is-visible > *:nth-child(3){transition-delay:.14s;}
+  .stagger.is-visible > *:nth-child(4){transition-delay:.20s;}
+  .stagger.is-visible > *:nth-child(5){transition-delay:.26s;}
+  .stagger.is-visible > *:nth-child(6){transition-delay:.32s;}
+  .stagger.is-visible > *:nth-child(7){transition-delay:.38s;}
+  .stagger.is-visible > *:nth-child(8){transition-delay:.44s;}
+
+  /* Point de la timeline : petit "pulse" au moment de l'apparition */
+  .tl-item.reveal.is-visible::before{
+    animation:pulseDot .6s ease .1s both;
+  }
+  @keyframes pulseDot{
+    0%{transform:scale(0); box-shadow:0 0 0 0 rgba(45,212,191,0.5);}
+    60%{transform:scale(1.3);}
+    100%{transform:scale(1); box-shadow:0 0 0 6px rgba(45,212,191,0);}
+  }
+
+  /* Tags : léger effet au survol en plus du fondu d'entrée */
+  .tag{
+    transition:border-color .2s ease, color .2s ease, transform .2s ease, background .2s ease;
+  }
+  .tag:hover{
+    border-color:var(--accent);
+    color:var(--text);
+    background:rgba(45,212,191,0.08);
+    transform:translateY(-2px);
+  }
+
+  /* Barres de compétences linguistiques : se remplissent à l'écran */
+  .lang-bar-fill{
+    width:0 !important;
+    transition:width 1.1s cubic-bezier(.22,.61,.36,1);
+  }
+  .lang-row.is-visible .lang-bar-fill{
+    width:var(--fill,0%) !important;
+  }
+
+  /* Cartes / lignes interactives : légère élévation au survol */
+  .cert-row{transition:background .2s ease, padding-left .2s ease;}
+  .cert-row:hover{background:rgba(45,212,191,0.04); padding-left:8px;}
+
+  .project-card{transition:border-color .25s ease, transform .25s ease, box-shadow .25s ease;}
+  .project-card:hover{
+    border-color:var(--accent-dim);
+    transform:translateY(-4px);
+    box-shadow:0 16px 32px -18px rgba(45,212,191,0.3);
+  }
+
+  .contact-item{transition:border-color .2s ease, transform .2s ease, box-shadow .2s ease;}
+  .contact-item:hover{
+    transform:translateY(-3px);
+    box-shadow:0 10px 22px -14px rgba(45,212,191,0.22);
+  }
+
+  .skill-group{transition:border-left-color .3s ease;}
+
+  /* Numéro de section : petite ligne qui se dessine au survol du titre */
+  section h2{position:relative; display:inline-block;}
+  section h2::after{
+    content:'';
+    position:absolute;
+    left:0; bottom:-8px;
+    width:0;
+    height:2px;
+    background:var(--accent);
+    transition:width .4s ease;
+  }
+  section.reveal.is-visible h2::after{width:36px;}
+
+  /* Lien de navigation actif (scrollspy géré en JS) */
+  nav.primary a{position:relative;}
+  nav.primary a.active{
+    color:var(--accent);
+    border-color:var(--accent);
+  }
+  nav.primary a.active::after{
+    content:'';
+    position:absolute;
+    left:-2px; top:50%;
+    width:2px; height:0;
+    background:var(--accent);
+  }
+
+  /* Boutons de téléchargement : pop léger à l'arrivée */
+  .dl-toolbar{animation:fadeSlideUp .6s ease both;}
+  .dl-btn:active{transform:scale(.96);}
+
+  /* Respect des préférences d'accessibilité : on coupe les animations
+     si l'utilisateur a demandé "reduced motion" dans son système */
+  @media (prefers-reduced-motion: reduce){
+    *, *::before, *::after{
+      animation-duration:0.001ms !important;
+      animation-iteration-count:1 !important;
+      transition-duration:0.001ms !important;
+      scroll-behavior:auto !important;
+    }
+    .reveal, .stagger > *{opacity:1; transform:none;}
+    .lang-bar-fill{width:var(--fill,0%) !important;}
+    body::before, body::after{display:none;}
+  }
+</style>
+</head>
+<body>
+
+<!-- =========================================================
+     BARRE D'ACTIONS
+     - "Écrire un email" / "Appeler" : contact direct, en un
+       clic, via des liens mailto:/tel: (ouvrent l'application
+       mail ou téléphone du visiteur — aucun script requis).
+     - "CV (PDF)" : vrai document texte généré par
+       buildAtsPdf()/downloadAsPdf() (voir le script JS en bas de
+       page) — celui-ci est le fichier à utiliser pour candidater,
+       reconnu par les plateformes de recrutement (ATS).
+     Le bouton "Image" (capture d'écran) a été retiré : seul le
+     vrai CV (texte) reste proposé au téléchargement.
+     ========================================================= -->
+<div class="dl-toolbar" id="dlToolbar">
+  <!-- Contact direct par email -->
+  <a class="dl-btn" href="mailto:djekornomdavid60@gmail.com" title="Écrire un email à David Djékornom">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 6-10 7L2 6"/></svg>
+    Écrire
+  </a>
+  <!-- Contact direct par téléphone -->
+  <a class="dl-btn" href="tel:+23560698392" title="Appeler David Djékornom">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.12.9.34 1.79.66 2.65a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.43-1.27a2 2 0 0 1 2.11-.45c.86.32 1.75.54 2.65.66A2 2 0 0 1 22 16.92z"/></svg>
+    Appeler
+  </a>
+  <!-- Export du vrai CV en PDF (texte réel, compatible ATS) -->
+  <button class="dl-btn" id="btnPdf" onclick="downloadAsPdf()" title="Le CV officiel à envoyer : texte réel, lisible par les logiciels de recrutement">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>
+    CV (PDF)
+  </button>
+</div>
+
+<div class="shell">
+  <aside class="sidebar">
+    <div>
+      <div class="id-block">
+        <!-- Photo : remplace "photo.jpg" par le nom réel du fichier envoyé par David,
+             placé dans le même dossier que ce fichier HTML. Si l'image ne charge pas,
+             les initiales "DD" s'affichent automatiquement à la place. -->
+        <div class="avatar">
+          <img src="photo.jpeg" alt="Photo de David Djekornom" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+          <span class="avatar-fallback" style="display:none;">DD</span>
+        </div>
+        <div class="name">Djékornom<br>David</div>
+        <div class="role">Ingénieur des Travaux Informatiques</div>
+        <div class="location"><span class="status-dot"></span> N'Djamena, Tchad — disponible</div>
+      </div>
+      <nav class="primary">
+        <a href="#profil">Profil</a>
+        <a href="#competences">Compétences</a>
+        <a href="#experience">Expérience</a>
+        <a href="#formation">Formation</a>
+        <a href="#certifications">Certifications</a>
+        <a href="#profil-perso">Profil perso</a>
+        <a href="#projet">Projet</a>
+        <a href="#references">Références</a>
+        <a href="#contact">Contact</a>
+      </nav>
+    </div>
+    <div class="sidebar-foot">
+      <a href="mailto:djekornomdavid60@gmail.com">djekornomdavid60@gmail.com</a>
+      <a href="tel:+23560698392">+235 60 69 83 92</a>
+      <a href="https://github.com/djekornomdavid60-lab" target="_blank" rel="noopener">github.com/djekornomdavid60-lab</a>
+    </div>
+  </aside>
+
+  <main>
+    <div class="content">
+
+      <section class="hero" id="profil">
+        <h1>Je fiabilise les réseaux et les systèmes qui font tourner l'infrastructure.</h1>
+        <p class="lede">
+          Ingénieur des travaux informatiques spécialisé en réseaux &amp; systèmes, actuellement en cycle
+          ingénieur Instrumentation et Micro-Informatique au Centre Régional AGRHYMET (Niamey). Expérience
+          en supervision réseau (NOC), administration de serveurs Windows et déploiement d'infrastructures
+          Wi-Fi et VoIP.
+        </p>
+        <div class="terminal">
+          status: ouvert aux stages &amp; alternances<span class="cursor"></span>
+        </div>
+      </section>
+
+      <section id="competences" class="reveal">
+        <span class="section-num mono">01</span>
+        <h2>Compétences</h2>
+
+        <div class="skill-group active">
+          <h3>Réseaux</h3>
+          <div class="tags stagger">
+            <span class="tag">CCNA</span>
+            <span class="tag">MikroTik</span>
+            <span class="tag">Déploiement Wi-Fi</span>
+            <span class="tag">VoIP</span>
+            <span class="tag">Supervision NOC</span>
+          </div>
+        </div>
+
+        <div class="skill-group active">
+          <h3>Systèmes</h3>
+          <div class="tags stagger">
+            <span class="tag">Windows Server</span>
+            <span class="tag">SQL Server</span>
+            <span class="tag">Administration Linux</span>
+            <span class="tag">Administration Windows</span>
+          </div>
+        </div>
+
+        <div class="skill-group">
+          <h3>Données</h3>
+          <div class="tags stagger">
+            <span class="tag">Collecte de données</span>
+            <span class="tag">Visualisation de données</span>
+          </div>
+        </div>
+
+        <div class="skill-group">
+          <h3>Logiciels métier &amp; outils</h3>
+          <div class="tags stagger">
+            <span class="tag">SAGE Comptabilité</span>
+            <span class="tag">Tompro</span>
+            <span class="tag">Photoshop</span>
+            <span class="tag">Illustrator</span>
+            <span class="tag">InDesign</span>
+          </div>
+        </div>
+      </section>
+
+      <section id="experience" class="reveal">
+        <span class="section-num mono">02</span>
+        <h2>Expérience</h2>
+        <div class="timeline">
+
+          <div class="tl-item reveal">
+            <div class="tl-date mono">Jan 2025 — Oct 2025</div>
+            <div class="tl-title">Front Office, Service NOC</div>
+            <div class="tl-org">CAMUSAT</div>
+            <div class="tl-desc">Supervision des incidents réseau, suivi et remontée des anomalies en temps réel.</div>
+          </div>
+
+          <div class="tl-item reveal">
+            <div class="tl-date mono">2023 — 2025</div>
+            <div class="tl-title">Consultant Sage</div>
+            <div class="tl-org">LOGEST</div>
+            <div class="tl-desc">Paramétrage avancé de SAGE Comptabilité et Tompro pour des clients professionnels.</div>
+          </div>
+
+          <div class="tl-item reveal">
+            <div class="tl-date mono">2023 — 2025</div>
+            <div class="tl-title">Formateur en informatique</div>
+            <div class="tl-org">Bureautique · SAGE · Tompro · Infographie</div>
+            <div class="tl-desc">Formation sur les outils bureautiques, la comptabilité SAGE et la suite Adobe (Photoshop, Illustrator, InDesign).</div>
+          </div>
+
+          <div class="tl-item reveal">
+            <div class="tl-date mono">Jan — Mai 2025</div>
+            <div class="tl-title">Stagiaire</div>
+            <div class="tl-org">CAMUSAT</div>
+          </div>
+
+          <div class="tl-item reveal">
+            <div class="tl-date mono">Août — Oct 2023</div>
+            <div class="tl-title">Stagiaire</div>
+            <div class="tl-org">LOGEST</div>
+          </div>
+
+        </div>
+      </section>
+
+      <section id="formation" class="reveal">
+        <span class="section-num mono">03</span>
+        <h2>Formation</h2>
+        <div class="timeline">
+
+          <div class="tl-item reveal">
+            <div class="tl-date mono">Depuis Nov 2025 — en cours</div>
+            <div class="tl-title">Cycle Ingénieur, Instrumentation &amp; Micro-Informatique</div>
+            <div class="tl-org">Centre Régional AGRHYMET — Niamey, Niger</div>
+          </div>
+
+          <div class="tl-item reveal">
+            <div class="tl-date mono">2020 — 2023</div>
+            <div class="tl-title">Licence Génie-Informatique, option Génie-Logiciel</div>
+            <div class="tl-org">Université St Charles Lwanga — Sarh, Tchad</div>
+          </div>
+
+          <div class="tl-item reveal">
+            <div class="tl-date mono">2020</div>
+            <div class="tl-title">Baccalauréat série D</div>
+          </div>
+
+        </div>
+      </section>
+
+      <section id="certifications" class="reveal">
+        <span class="section-num mono">04</span>
+        <h2>Certifications</h2>
+        <div class="cert-list stagger">
+
+          <div class="cert-row">
+            <div>
+              <div class="cert-name">CCNA</div>
+              <div class="cert-org">Skill Gates Group Sarl</div>
+            </div>
+            <div class="cert-date">Nov 2024 — Mars 2025</div>
+          </div>
+
+          <div class="cert-row">
+            <div>
+              <div class="cert-name">Collecte et visualisation des données</div>
+              <div class="cert-org">INTL DATA Consulting</div>
+            </div>
+            <div class="cert-date">Juil — Août 2025</div>
+          </div>
+
+          <div class="cert-row">
+            <div>
+              <div class="cert-name">OS MikroTik — WiFi Zone</div>
+              <div class="cert-org">Digi-Tech</div>
+            </div>
+            <div class="cert-date">Fév 2026</div>
+          </div>
+
+        </div>
+      </section>
+
+      <section id="profil-perso" class="reveal">
+        <span class="section-num mono">05</span>
+        <h2>Profil personnel</h2>
+
+        <div class="info-grid stagger">
+          <div class="contact-item">
+            <div class="contact-label mono">NÉ LE</div>
+            <div class="contact-value">20/04/2002 à Bébédjia</div>
+          </div>
+          <div class="contact-item">
+            <div class="contact-label mono">NATIONALITÉ</div>
+            <div class="contact-value">Tchadienne</div>
+          </div>
+          <div class="contact-item">
+            <div class="contact-label mono">SITUATION</div>
+            <div class="contact-value">Célibataire</div>
+          </div>
+        </div>
+
+        <div class="lang-list">
+          <div class="lang-row reveal">
+            <div class="lang-head"><span class="lang-name">Français</span><span class="lang-level">courant</span></div>
+            <div class="lang-bar"><div class="lang-bar-fill" style="--fill:95%;"></div></div>
+          </div>
+          <div class="lang-row reveal">
+            <div class="lang-head"><span class="lang-name">Anglais</span><span class="lang-level">intermédiaire</span></div>
+            <div class="lang-bar"><div class="lang-bar-fill" style="--fill:55%;"></div></div>
+          </div>
+        </div>
+
+        <div class="interests stagger">
+          <span class="tag">Lecture</span>
+          <span class="tag">Internet</span>
+          <span class="tag">Recherches</span>
+          <span class="tag">Sport</span>
+        </div>
+      </section>
+
+      <section id="projet" class="reveal">
+        <span class="section-num mono">06</span>
+        <h2>Projet en cours</h2>
+        <div class="project-card">
+          <div class="project-status"><span class="status-dot"></span> en développement — mémoire de fin d'études</div>
+          <h3>Plateforme intelligente de gestion, traçabilité et continuité des opérations — ASECNA Tchad</h3>
+          <p>
+            Conception d'une plateforme centralisant le suivi des opérations d'un service de météorologie
+            aéronautique, la traçabilité complète des actions (audit) et la continuité de service en cas
+            d'incident, dans un cadre inspiré des missions et référentiels qualité de l'ASECNA.
+          </p>
+          <div class="project-meta">
+            <span class="tag">Traçabilité</span>
+            <span class="tag">Continuité de service</span>
+            <span class="tag">Supervision temps réel</span>
+          </div>
+        </div>
+        <div class="project-card">
+          <div class="project-status"><span class="status-dot"></span> en développement — mémoire de fin d'études</div>
+          <h3>METEO TASK</h3>
+          <p>
+             Conception et développement d’une plateforme multiplateforme de gestion, de suivi et de surveillance des stations météorologiques et des interventions techniques.
+          </p>
+          <div class="project-meta">
+            <span class="tag">Traçabilité</span>
+            <span class="tag">Continuité de service</span>
+            <span class="tag">Supervision temps réel</span>
+          </div>
+        </div>
+      </section>
+
+      <section id="references" class="reveal">
+        <span class="section-num mono">07</span>
+        <h2>Références</h2>
+        <div class="ref-grid stagger">
+          <div class="ref-card">
+            <div class="ref-name">Ing. Madjitoloum Blaise</div>
+            <div class="ref-role">Coordonnateur des activités à LOGEST</div>
+            <div class="ref-contact">63 24 90 30 / 91 45 63 45</div>
+          </div>
+          <div class="ref-card">
+            <div class="ref-name">Ing. Ndoubabé</div>
+            <div class="ref-role">Chef de département en Génie Informatique</div>
+            <div class="ref-contact">66 41 54 60</div>
+          </div>
+          <div class="ref-card">
+            <div class="ref-name">Madjingar Bemadjita</div>
+            <div class="ref-role">Ancien DRH de CAMUSAT</div>
+            <div class="ref-contact">66 04 80 86 / 90 08 25 20</div>
+          </div>
+        </div>
+      </section>
+
+      <section id="contact" class="reveal">
+        <span class="section-num mono">08</span>
+        <h2>Contact</h2>
+        <div class="contact-grid stagger">
+          <a class="contact-item" href="mailto:djekornomdavid60@gmail.com">
+            <div class="contact-label mono">EMAIL</div>
+            <div class="contact-value">djekornomdavid60@gmail.com</div>
+          </a>
+          <a class="contact-item" href="tel:+23560698392">
+            <div class="contact-label mono">TÉLÉPHONE</div>
+            <div class="contact-value">+235 60 69 83 92 / 92 65 60 31</div>
+          </a>
+          <a class="contact-item" href="https://github.com/djekornomdavid60-lab" target="_blank" rel="noopener">
+            <div class="contact-label mono">GITHUB</div>
+            <div class="contact-value">djekornomdavid60-lab</div>
+          </a>
+          <div class="contact-item">
+            <div class="contact-label mono">LOCALISATION</div>
+            <div class="contact-value">N'Djamena, Tchad</div>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </main>
+</div>
+
+<footer>David Djekornom — portfolio</footer>
+
+<!-- =========================================================
+     LIBRAIRIE EXTERNE (ajoutée)
+     - jsPDF : construit le fichier PDF du CV côté navigateur,
+       en texte réel (voir buildAtsPdf() plus bas).
+     Chargée depuis un CDN public (cdnjs), donc une connexion
+     internet est nécessaire au moment du clic sur "CV (PDF)".
+     ========================================================= -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+<script>
+  /* ===========================================================
+     FONCTIONS DE TÉLÉCHARGEMENT (ajoutées)
+     Ce script gère les 2 boutons "Image" et "PDF" de la barre
+     en haut de la page. Il ne modifie aucune donnée du CV :
+     il se contente de "capturer" ce qui est affiché à l'écran.
+     =========================================================== */
+
+  /**
+   * Change l'apparence d'un bouton pendant la génération
+   * (affiche "Génération…" et le désactive), puis le remet
+   * dans son état normal une fois terminé.
+   * @param {HTMLElement} btn - le bouton concerné
+   * @param {boolean} isLoading - true = début, false = fin
+   */
+  function setLoading(btn, isLoading){
+    if(isLoading){
+      btn.classList.add('loading');           // applique .dl-btn.loading (CSS) -> grisé + non cliquable
+      btn.dataset.original = btn.innerHTML;    // on sauvegarde le contenu original du bouton (icône + texte)
+      btn.innerHTML = '<span class="mono">Génération…</span>';
+    } else {
+      btn.classList.remove('loading');
+      btn.innerHTML = btn.dataset.original;    // on remet l'icône + le texte d'origine
+    }
+  }
+
+  /**
+   * ===========================================================
+   * GÉNÉRATEUR DE PDF "VRAI CV" (remplace l'ancienne version)
+   * -----------------------------------------------------------
+   * Avant : le bouton PDF prenait une CAPTURE D'ÉCRAN (image) du
+   * site et la collait dans un PDF. Résultat : le texte n'était
+   * pas du texte, mais des pixels. Un ATS (logiciel de tri de CV
+   * utilisé par la plupart des plateformes de recrutement) ne
+   * peut RIEN lire dans une image : ton CV était invisible pour
+   * ces systèmes, même si un humain pouvait le lire à l'écran.
+   *
+   * Maintenant : ce code construit le PDF ligne par ligne avec du
+   * VRAI TEXTE (police standard, une seule colonne, pas d'icônes
+   * ni de tableaux), en piochant le contenu directement dans les
+   * sections du site (mêmes éléments que ceux affichés à l'écran).
+   * Avantages :
+   *  - Texte sélectionnable/copiable et lisible par les ATS.
+   *  - Mise en page sobre à 1 colonne (format que tous les
+   *    parseurs de CV comprennent, contrairement à 2 colonnes).
+   *  - Toujours synchronisé avec le contenu du site : si tu
+   *    modifies une expérience ou une compétence dans le HTML,
+   *    le PDF généré reflète automatiquement le changement.
+   * ===========================================================
+   */
+  function buildAtsPdf(){
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF('p', 'pt', 'a4');   // unité "pt" = points typographiques, plus précis pour du texte
+
+    // --- Constantes de mise en page ---------------------------
+    const MARGIN    = 46;
+    const PAGE_W    = doc.internal.pageSize.getWidth();
+    const PAGE_H    = doc.internal.pageSize.getHeight();
+    const CONTENT_W = PAGE_W - MARGIN * 2;
+    const ACCENT    = [27, 143, 130];   // = --accent-dim du site (#1B8F82), plus lisible sur fond blanc que --accent
+    const DARK      = [26, 32, 44];
+    const GRAY       = [95, 103, 115];
+    let y = MARGIN;
+
+    // --- Petits utilitaires de lecture du DOM -----------------
+    const q     = (sel, root=document) => root.querySelector(sel);
+    const qa    = (sel, root=document) => Array.from(root.querySelectorAll(sel));
+    const txt   = (el) => el ? el.textContent.replace(/\s+/g,' ').trim() : '';
+
+    // Ajoute une nouvelle page si le prochain bloc ne tient plus
+    function ensureSpace(h){
+      if(y + h > PAGE_H - MARGIN){ doc.addPage(); y = MARGIN; }
+    }
+
+    // Titre de section (ex: "EXPÉRIENCE PROFESSIONNELLE") + filet
+    function heading(title){
+      ensureSpace(28);
+      y += 12;
+      doc.setFont('helvetica','bold'); doc.setFontSize(11); doc.setTextColor(...ACCENT);
+      doc.text(title.toUpperCase(), MARGIN, y);
+      y += 5;
+      doc.setDrawColor(...ACCENT); doc.setLineWidth(1);
+      doc.line(MARGIN, y, PAGE_W - MARGIN, y);
+      y += 14;
+    }
+
+    // Paragraphe de texte normal, avec retour à la ligne automatique
+    function paragraph(str, opts={}){
+      if(!str) return;
+      const size = opts.size || 9.5;
+      doc.setFont('helvetica', opts.bold ? 'bold' : (opts.italic ? 'italic' : 'normal'));
+      doc.setFontSize(size);
+      doc.setTextColor(...(opts.color || DARK));
+      doc.splitTextToSize(str, opts.width || CONTENT_W).forEach(line=>{
+        ensureSpace(size * 1.35);
+        doc.text(line, MARGIN, y);
+        y += size * 1.35;
+      });
+      y += (opts.gap !== undefined ? opts.gap : 10);
+    }
+
+    // Ligne "Titre du poste .......... dates" (titre à gauche, date alignée à droite)
+    function entryLine(title, date){
+      ensureSpace(14);
+      doc.setFont('helvetica','bold'); doc.setFontSize(10.5); doc.setTextColor(...DARK);
+      doc.text(title, MARGIN, y);
+      if(date){
+        doc.setFont('courier','normal'); doc.setFontSize(8.5); doc.setTextColor(...GRAY);
+        doc.text(date, PAGE_W - MARGIN, y, {align:'right'});
+      }
+      y += 13;
+    }
+
+    // Ligne secondaire (ex: nom de l'entreprise / rôle du contact)
+    function subLine(str){
+      if(!str) return;
+      ensureSpace(12);
+      doc.setFont('helvetica','italic'); doc.setFontSize(9.5); doc.setTextColor(...GRAY);
+      doc.text(str, MARGIN, y);
+      y += 13;
+    }
+
+    // Ligne "Catégorie : élément 1, élément 2, ..." (utilisée pour les compétences)
+    function skillLine(category, items){
+      if(!items) return;
+      ensureSpace(13);
+      doc.setFont('helvetica','bold'); doc.setFontSize(9.5); doc.setTextColor(...DARK);
+      const label = category + ' : ';
+      doc.text(label, MARGIN, y);
+      const labelW = doc.getTextWidth(label);
+      doc.setFont('helvetica','normal'); doc.setTextColor(...GRAY);
+      const lines = doc.splitTextToSize(items, CONTENT_W - labelW);
+      doc.text(lines[0], MARGIN + labelW, y);
+      y += 13;
+      for(let i=1;i<lines.length;i++){
+        ensureSpace(13);
+        doc.text(lines[i], MARGIN, y);
+        y += 13;
+      }
+      y += 4;
+    }
+
+    // Section "expérience" ou "formation" : liste d'items de timeline
+    function renderTimeline(sectionSel, title){
+      const items = qa(sectionSel + ' .timeline .tl-item');
+      if(!items.length) return;
+      heading(title);
+      items.forEach(item=>{
+        const date  = txt(q('.tl-date', item));
+        const t     = txt(q('.tl-title', item));
+        const org   = txt(q('.tl-org', item));
+        const desc  = txt(q('.tl-desc', item));
+        entryLine(t, date);
+        if(org) subLine(org);
+        if(desc) paragraph(desc, {size:9, gap:10}); else y += 6;
+      });
+    }
+
+    // ===================== EN-TÊTE =====================
+    // Nom : le site affiche "Djékornom" puis "David" sur 2 lignes
+    // (choix stylistique du portfolio). Sur le CV, on garde l'ordre
+    // demandé : NOM (en majuscules) puis Prénom, ex. "DJEKORNOM David".
+    const nameEl = q('.name');
+    let fullName = 'DJEKORNOM David';
+    // Le NOM est mis en majuscules SANS accent (ex: "Djékornom" -> "DJEKORNOM"),
+    // conforme à l'orthographe demandée.
+    const stripAccents = (s) => s.normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+    if(nameEl){
+      const parts = nameEl.innerHTML.split(/<br\s*\/?>/i).map(s=>s.replace(/<[^>]+>/g,'').trim()).filter(Boolean);
+      if(parts.length >= 2) fullName = stripAccents(parts[0]).toUpperCase() + ' ' + parts[1];
+      else if(parts.length === 1) fullName = stripAccents(parts[0]).toUpperCase();
+    }
+    const role     = txt(q('.role'));
+    const location = txt(q('.location')).replace(/—\s*disponible/i,'').trim();
+    const email    = txt(q('.sidebar-foot a[href^="mailto:"]'));
+    const phone    = txt(q('.sidebar-foot a[href^="tel:"]'));
+    const github   = txt(q('.sidebar-foot a[href*="github"]'));
+
+    doc.setFont('helvetica','bold'); doc.setFontSize(22); doc.setTextColor(...DARK);
+    doc.text(fullName, MARGIN, y); y += 22;
+
+    doc.setFont('helvetica','normal'); doc.setFontSize(12.5); doc.setTextColor(...ACCENT);
+    doc.text(role, MARGIN, y); y += 17;
+
+    doc.setFont('helvetica','normal'); doc.setFontSize(9); doc.setTextColor(...GRAY);
+    doc.text([location, email, phone, github].filter(Boolean).join('   |   '), MARGIN, y);
+    y += 16;
+
+    doc.setDrawColor(...DARK); doc.setLineWidth(1.2);
+    doc.line(MARGIN, y, PAGE_W - MARGIN, y);
+    y += 18;
+
+    // ===================== PROFIL =====================
+    paragraph(txt(q('#profil .lede')), {size:9.5, gap:14});
+
+    // ===================== COMPÉTENCES =====================
+    const skillGroups = qa('#competences .skill-group');
+    if(skillGroups.length){
+      heading('Compétences');
+      skillGroups.forEach(group=>{
+        const cat   = txt(q('h3', group));
+        const items = qa('.tag', group).map(txt).join(', ');
+        skillLine(cat, items);
+      });
+    }
+
+    // ===================== EXPÉRIENCE / FORMATION =====================
+    renderTimeline('#experience', 'Expérience professionnelle');
+    renderTimeline('#formation', 'Formation');
+
+    // ===================== CERTIFICATIONS =====================
+    const certs = qa('#certifications .cert-row');
+    if(certs.length){
+      heading('Certifications');
+      certs.forEach(row=>{
+        const name = txt(q('.cert-name', row));
+        const org  = txt(q('.cert-org', row));
+        const date = txt(q('.cert-date', row));
+        entryLine(name + (org ? ' — ' + org : ''), date);
+        y += 4;
+      });
+    }
+
+    // ===================== PROJET EN COURS =====================
+    const project = q('#projet .project-card');
+    if(project){
+      heading('Projet en cours');
+      const status = txt(q('.project-status', project));
+      const title  = txt(q('h3', project));
+      const desc   = txt(q('p', project));
+      const tags   = qa('.project-meta .tag', project).map(txt).join(', ');
+      entryLine(title, '');
+      if(status) subLine(status);
+      paragraph(desc, {size:9, gap: tags ? 4 : 10});
+      if(tags) paragraph('Mots-clés : ' + tags, {size:8.5, color:GRAY, gap:10});
+    }
+
+    // ===================== LANGUES =====================
+    const langs = qa('.lang-list .lang-row');
+    if(langs.length){
+      heading('Langues');
+      paragraph(langs.map(r => txt(q('.lang-name', r)) + ' (' + txt(q('.lang-level', r)) + ')').join('   ·   '), {size:9.5});
+    }
+
+    // ===================== CENTRES D'INTÉRÊT =====================
+    const interests = qa('#profil-perso .interests .tag').map(txt).join(', ');
+    if(interests){
+      heading("Centres d'intérêt");
+      paragraph(interests, {size:9.5});
+    }
+
+    // ===================== INFORMATIONS COMPLÉMENTAIRES =====================
+    const infoItems = qa('#profil-perso .info-grid .contact-item');
+    if(infoItems.length){
+      heading('Informations complémentaires');
+      paragraph(infoItems.map(it => txt(q('.contact-label', it)) + ' : ' + txt(q('.contact-value', it))).join('    |    '), {size:9, color:GRAY});
+    }
+
+    // ===================== RÉFÉRENCES =====================
+    const refs = qa('#references .ref-card');
+    if(refs.length){
+      heading('Références');
+      refs.forEach(card=>{
+        const name    = txt(q('.ref-name', card));
+        const rrole   = txt(q('.ref-role', card));
+        const contact = txt(q('.ref-contact', card));
+        entryLine(name, '');
+        if(rrole) subLine(rrole);
+        if(contact) paragraph(contact, {size:9, color:GRAY, gap:8});
+      });
+    }
+
+    // Métadonnées du fichier : utile pour que certains ATS et
+    // gestionnaires de fichiers affichent le vrai nom/titre plutôt
+    // qu'un nom de fichier générique.
+    doc.setProperties({
+      title: fullName + ' — CV',
+      subject: role,
+      author: fullName,
+      keywords: 'CV, ' + role
+    });
+
+    return doc;
+  }
+
+  /**
+   * Bouton "PDF" : construit le vrai document texte via
+   * buildAtsPdf() (voir ci-dessus) et le télécharge. Ne dépend
+   * plus de captureShell()/html2canvas : génération quasi
+   * instantanée et fiable même en ouverture locale (file://).
+   */
+  async function downloadAsPdf(){
+    const btn = document.getElementById('btnPdf');
+    setLoading(btn, true);
+    try{
+      const doc = buildAtsPdf();
+      doc.save('CV_DJEKORNOM_David.pdf');
+    }catch(e){
+      console.error('[downloadAsPdf] détail complet de l\'erreur :', e);
+      alert("Erreur lors de la génération du PDF : " + e.message);
+    }finally{
+      setLoading(btn, false);
+    }
+  }
+</script>
+
+<!-- =========================================================
+     ANIMATIONS AU DÉFILEMENT (ajoutée)
+     - reveal.js : fait apparaître en douceur les sections, les
+       éléments de timeline et les barres de langues quand ils
+       entrent dans l'écran (IntersectionObserver).
+     - scrollspy.js : surligne dans le menu de gauche le lien
+       correspondant à la section actuellement visible.
+     Aucune de ces fonctions ne modifie le contenu du CV : elles
+     ajoutent/retirent uniquement des classes CSS.
+     ========================================================= -->
+<script>
+  (function(){
+    // Si l'utilisateur a demandé "réduire les animations" au niveau
+    // du système, on affiche directement tout sans animation.
+    var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    var revealTargets = document.querySelectorAll('.reveal, .stagger');
+
+    if(reduceMotion || !('IntersectionObserver' in window)){
+      revealTargets.forEach(function(el){ el.classList.add('is-visible'); });
+      return;
+    }
+
+    var observer = new IntersectionObserver(function(entries){
+      entries.forEach(function(entry){
+        if(entry.isIntersecting){
+          entry.target.classList.add('is-visible');
+          observer.unobserve(entry.target); // l'animation ne se joue qu'une fois
+        }
+      });
+    }, {
+      threshold: 0.12,       // se déclenche dès qu'environ 12% de l'élément est visible
+      rootMargin: '0px 0px -60px 0px'  // se déclenche un peu avant le bas de l'écran
+    });
+
+    revealTargets.forEach(function(el){ observer.observe(el); });
+  })();
+
+  /* ---- Scrollspy : surligne le lien de menu actif selon la section visible ---- */
+  (function(){
+    var navLinks = Array.prototype.slice.call(document.querySelectorAll('nav.primary a'));
+    var sections = navLinks
+      .map(function(link){ return document.querySelector(link.getAttribute('href')); })
+      .filter(Boolean);
+
+    if(!sections.length || !('IntersectionObserver' in window)) return;
+
+    var spy = new IntersectionObserver(function(entries){
+      entries.forEach(function(entry){
+        var id = '#' + entry.target.id;
+        var link = navLinks.find(function(l){ return l.getAttribute('href') === id; });
+        if(!link) return;
+        if(entry.isIntersecting){
+          navLinks.forEach(function(l){ l.classList.remove('active'); });
+          link.classList.add('active');
+        }
+      });
+    }, {
+      threshold: 0,
+      rootMargin: '-45% 0px -50% 0px'  // considère la section "active" quand elle traverse le milieu de l'écran
+    });
+
+    sections.forEach(function(sec){ spy.observe(sec); });
+  })();
+</script>
+</body>
+</html>
